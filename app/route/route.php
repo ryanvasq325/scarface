@@ -15,6 +15,9 @@ $app->get('/home', Home::class . ':home')->add(Middleware::authentication());
 
 $app->get('/login', Login::class . ':login');
 
+$app->group('/home', function (RouteCollectorProxy $group) {
+    #$group->post('/tema', Home::class . ':tema');
+});
 $app->group('/login', function (RouteCollectorProxy $group) {
     $group->post('/precadastro', Login::class . ':precadastro');
     $group->post('/autenticar', Login::class . ':autenticar');
