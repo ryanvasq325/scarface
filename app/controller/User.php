@@ -36,7 +36,6 @@ class User extends Base
             $sobrenome = $_POST['sobrenome'];
             $cpf = $_POST['cpf'];
             $rg = $_POST['rg'];
-            $data_nascimento = $_POST['data_nascimento'];
             $senha = $_POST['senha'];
             
             
@@ -45,7 +44,6 @@ class User extends Base
                 'sobrenome' => $sobrenome,
                 'cpf' => $cpf,
                 'rg' => $rg,
-                'data_nascimento' => $data_nascimento,
                 'senha' => $senha
             ];
 
@@ -96,19 +94,17 @@ class User extends Base
           2 => 'sobrenome',  
           3 => 'cpf',  
           4 => 'rg',  
-          5 => 'data_nascimento'
         ];
         #Capturamos o nome do campo a ser odernado.
         $orderField = $fields[$order];
         #O termo pesquisado
         $term = $form ['search']['value'];
-        $query = SelectQuery::select('id,nome,sobrenome,cpf,rg,data_nascimento')->from('usuario');
+        $query = SelectQuery::select('id,nome,sobrenome,cpf,rg')->from('usuario');
         if (!is_null($term) && ($term !== '')) {
             $query->where('nome', 'ilike', "%{$term}%", 'or')
             ->where('sobrenome', 'ilike', "%{$term}%", 'or')
             ->where('cpf', 'ilike', "%{$term}%", 'or')
-            ->where('rg', 'ilike', "%{$term}%", 'or')
-            ->where('data_nascimento', 'ilike', "%{$term}%");
+            ->where('rg', 'ilike', "%{$term}%");
         }
         $users = $query
         ->order($orderField, $orderType)
@@ -122,7 +118,6 @@ class User extends Base
                 $value['sobrenome'],
                 $value['cpf'],
                 $value['rg'],
-                $value['data_nascimento'],
                 "<button class='btn btn-warning'>Editar</button>
                 <button class='btn btn-danger'>Excluir</button>"
             ];
