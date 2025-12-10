@@ -10,4 +10,5 @@ Salvar.addEventListener('click', async () => {
     Validate.SetForm('form').Validate();
     const response = await Requests.SetForm('form').Post('/usuario/insert');
     console.log(response);
+    
 });
