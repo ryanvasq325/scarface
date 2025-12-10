@@ -124,7 +124,7 @@ class Cliente extends Base
                 $value['cpf_cnpj'],
                 $value['rg_ie'],
                 "<button class='btn btn-warning'>Editar</button>
-                <button class='btn btn-danger'>Excluir</button>"
+                <button type='button'  onclick='Delete(" . $value['id'] . ");' class='btn btn-danger'>Excluir</button>"
             ];
         }
         $data = [
