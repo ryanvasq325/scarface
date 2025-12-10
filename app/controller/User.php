@@ -118,8 +118,15 @@ class User extends Base
                 $value['sobrenome'],
                 $value['cpf'],
                 $value['rg'],
-                "<button class='btn btn-warning'>Editar</button>
-                <button class='btn btn-danger'>Excluir</button>"
+                "<button class='btn btn-warning'>
+                <i class=\"bi bi-pen-fill\"></i>
+                Editar
+                </button>
+
+                <button class='btn btn-danger'>
+                <i class=\"bi bi-trash-fill\"></i>
+                Excluir
+                </button>"
             ];
         }
         $data = [
