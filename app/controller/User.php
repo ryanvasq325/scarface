@@ -44,7 +44,7 @@ class User extends Base
                 'sobrenome' => $sobrenome,
                 'cpf' => $cpf,
                 'rg' => $rg,
-                'senha' => $senha
+                'senha' => password_hash($senha, PASSWORD_DEFAULT)
             ];
 
             $IsSave = InsertQuery::table('usuario')->save($FieldsAndValues);
@@ -100,12 +100,15 @@ class User extends Base
                 $value['sobrenome'],
                 $value['cpf'],
                 $value['rg'],
-                "<button class='btn btn-warning'>
+                "<button type='button' onclick='Editar(" . $value['id'] . ");' class='btn btn-warning'>
                 <i class=\"bi bi-pen-fill\"></i>
                 Editar
                 </button>
 
-                 <button type='button'  onclick='Delete(" . $value['id'] . ");' class='btn btn-danger'>Excluir</button>"
+                 <button type='button'  onclick='Delete(" . $value['id'] . ");' class='btn btn-danger'>
+                 <i class=\"bi bi-trash-fill\"></i>
+                 Excluir
+                 </button>"
             ];
         }
         $data = [
