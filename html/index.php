@@ -10,11 +10,29 @@ require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../app/helper/settings.php';
 
 #Gera um código de 6 digitos para recuperação de e-mail.
-#$codigo = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-#$email = Email::add('Esqueci minha senha', "<h1>Olá Mundo massas {$codigo}</h1>", 'RYAN DE SOUZA VASQUES', 'ryanvasques77@gmail.com');
-#$IsSend = $email->send();
-#var_dump($IsSend);
-#die;
+$codigo = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+$email = Email::add('Esqueci minha senha', "
+<div class=\"email-container\">
+  <div class=\"header\">
+    <h1>Seu código de verificação</h1>
+  </div>
+
+  <div class=\"content\">
+    <p>Olá! Aqui está o seu código de verificação de 6 dígitos. Use-o para confirmar sua identidade:</p>
+    <div class=\"code-box\">{$codigo}</div>
+    <p>O código é válido por 10 minutos. Não compartilhe com ninguém.</p>
+  </div>
+
+  <div class=\"footer\">
+    © 2025 Sua Empresa. Todos os direitos reservados.
+  </div>
+</div>"
+
+
+, 'RYAN DE SOUZA VASQUES', 'ryanvasques77@gmail.com');
+$IsSend = $email->send();
+var_dump($IsSend);
+die;
 
 #Cria a aplicação Slim,retornando um objeto que representa o servidor HTTP e gerenciador de rotas.
 $app = AppFactory::create();
