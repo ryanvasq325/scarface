@@ -10,7 +10,7 @@ class Email
     private $mail;
     private array $data;
     private $error;
-    public function __construct() 
+    public function __construct()
     { 
         $this->data = [];
         $this->mail = new PHPMailer(true);
