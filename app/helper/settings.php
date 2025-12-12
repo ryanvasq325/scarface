@@ -15,7 +15,7 @@ define('CONFIG_SMTP_EMAIL',[
     'host' => 'smtp.titan.com',
     'port' => 587,
     'user' => 'noreplay@mkt.fanorte.edu.br',
-    'pass' => '@w906083W@',
+    'passwd' => '@w906083W@',
     'from_name' => 'Mercantor',
     'from_email' => 'noreplay@mkt.fanorte.edu.br',
     ]);
