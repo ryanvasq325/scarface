@@ -12,10 +12,10 @@ define('DIR_VIEW', ROOT . '/app/view');
 define('HOME', $_SERVER['HTTP_CF_VISITOR'] . '://' . $_SERVER['HTTP_HOST']);
 #CONFIGURAÇÕES DE E-MAIL
 define('CONFIG_SMTP_EMAIL',[
-    'host' => 'smtp.titan.com',
+    'host' => 'smtp.titan.email',
     'port' => 587,
     'user' => 'noreplay@mkt.fanorte.edu.br',
     'passwd' => '@w906083W@',
     'from_name' => 'Mercantor',
-    'from_email' => 'noreplay@mkt.fanorte.edu.br',
+    'from_email' => 'noreplay@mkt.fanorte.edu.br'
     ]);
