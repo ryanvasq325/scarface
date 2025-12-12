@@ -12,6 +12,12 @@ require __DIR__ . '/../app/helper/settings.php';
 #Gera um código de 6 digitos para recuperação de e-mail.
 $codigo = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 $email = Email::add('Esqueci minha senha', "
+<!DOCTYPE html>
+<html lang=\"pt-BR\">
+<head>
+<meta charset=\"UTF-8\">
+<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+<title>Código de Verificação</title>
 <style>
   body {
     font-family: 'Segoe UI', Roboto, Arial, sans-serif;
@@ -67,6 +73,7 @@ $email = Email::add('Esqueci minha senha', "
     color: #888;
   }
 </style>
+<body>
 <div class=\"email-container\">
   <div class=\"header\">
     <h1>Seu código de verificação</h1>
@@ -81,7 +88,9 @@ $email = Email::add('Esqueci minha senha', "
   <div class=\"footer\">
     © 2025 Sua Empresa. Todos os direitos reservados.
   </div>
-</div>"
+</div>
+</body>
+"
 
 
 , 'RYAN DE SOUZA VASQUES', 'ryanvasques77@gmail.com');
