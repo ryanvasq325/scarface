@@ -10,3 +10,12 @@ define('DIR_VIEW', ROOT . '/app/view');
 #$_SERVER['REQUEST_SCHEME'] : Indica o protocolo usado na requisição atual. podendo ser http ou https
 #Criamos uma constante chamada HOME que guarda automaticamente o endereço principal do site.
 define('HOME', $_SERVER['HTTP_CF_VISITOR'] . '://' . $_SERVER['HTTP_HOST']);
+#CONFIGURAÇÕES DE E-MAIL
+define('CONFIG_SMTP_EMAIL',[
+    'host' => 'smtp.example.com',
+    'port' => 587,
+    'user' => 'noreplay@mkt.fanorte.edu.br',
+    'pass' => '@w906083W@',
+    'from_name' => 'Mercantor',
+    'from_email' => 'noreplay@mkt.fanorte.edu.br',
+    ]);

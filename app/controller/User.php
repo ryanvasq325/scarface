@@ -126,6 +126,21 @@ class User extends Base
             ->withStatus(200);
     }
 
+    public function alterar($request, $response, $args)
+    {
+        $id = $args['id'];
+        
+        $dadosTemplate = [
+            'titulo' => 'Alterar usuário',
+            'userId' => $id
+        ];
+        return $this->getTwig()
+            ->render($response, $this->setView('user'), $dadosTemplate)
+            ->withHeader('Content-Type', 'text/html')
+            ->withStatus(200);
+    }
+
+
     public function delete($request, $response)
     {
         try {
