@@ -1,3 +1,4 @@
+import { DataTables } from "./DataTables.js";
 import { Requests } from "./Requests.js";
 
 const tabela = new $('#tabela').DataTable({
@@ -50,25 +51,4 @@ async function Delete(id) {
     });
     tabela.ajax.reload();
 }
-async function Editar(id) {
-    document.getElementById('id').value = id;
-    $('#editar').modal('show');
-
-    try {
-        const response = await Requests.SetForm('form').Post('/usuario/update');
-
-        if (response.success) {
-            alert('Usuario atualizado com sucesso!');
-            $('#editar').modal('hide');
-            if (typeof table !== "undefined") table.ajax.reload();
-        } else {
-            alert(response.message || 'Erro ao atualizar.');
-        }
-
-    } catch (error) {
-        console.error(error);
-        alert('Erro inesperado ao atualizar o usuario.');
-    }
-}
-window.Editar = Editar;
 window.Delete = Delete;
