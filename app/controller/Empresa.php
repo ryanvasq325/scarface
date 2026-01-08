@@ -4,6 +4,7 @@ namespace app\controller;
 
 use app\database\builder\InsertQuery;
 use app\database\builder\SelectQuery;
+use app\database\builder\DeleteQuery;
 
 class Empresa extends Base
 {
@@ -35,13 +36,15 @@ class Empresa extends Base
             $sobrenome = $_POST['sobrenome'];
             $cpf = $_POST['cpf'];
             $rg = $_POST['rg'];
+            $data_nascimento = $_POST['data_nascimento'];
             
             
             $FieldsAndValues = [
                 'nome_fantasia' => $nome,
                 'sobrenome_razao' => $sobrenome,
                 'cpf_cnpj' => $cpf,
-                'rg_ie' => $rg
+                'rg_ie' => $rg,
+                'data_nascimento_abertura' => $data_nascimento,
             ];
 
             $IsSave = InsertQuery::table('empresa')->save($FieldsAndValues);
@@ -53,6 +56,25 @@ class Empresa extends Base
             die;
         } catch (\Throwable $th) {
             //throw $th;
+        }
+    }
+    public function delete($request, $response)
+    {
+        try {
+            $id = $_POST['id'];
+            $IsDelete = DeleteQuery::table('empresa')
+                ->where('id', '=', $id)
+                ->delete();
+
+            if (!$IsDelete) {
+                echo 'Erro ao deletar';
+                die;
+            }
+            echo "Deletado com sucesso!";
+            die;
+        } catch (\Throwable $th) {
+            echo "Erro: " . $th->getMessage();
+            die;
         }
     }
         public function listempresa($request, $response){
@@ -72,17 +94,19 @@ class Empresa extends Base
           2 => 'sobrenome_razao',  
           3 => 'cpf_cnpj',  
           4 => 'rg_ie',
+          5 => 'data_nascimento_abertura',
         ];
         #Capturamos o nome do campo a ser odernado.
         $orderField = $fields[$order];
         #O termo pesquisado
         $term = $form ['search']['value'];
-        $query = SelectQuery::select('id,nome_fantasia,sobrenome_razao,cpf_cnpj,rg_ie')->from('empresa');
+        $query = SelectQuery::select('id,nome_fantasia,sobrenome_razao,cpf_cnpj,rg_ie,data_nascimento_abertura')->from('empresa');
         if (!is_null($term) && ($term !== '')) {
             $query->where('nome_fantasia', 'ilike', "%{$term}%", 'or')
             ->where('sobrenome_razao', 'ilike', "%{$term}%", 'or')
             ->where('cpf_cnpj', 'ilike', "%{$term}%", 'or')
-            ->where('rg_ie', 'ilike', "%{$term}%");
+            ->where('rg_ie', 'ilike', "%{$term}%")
+            ->where('data_nascimento_abertura', 'ilike', "%{$term}%");
         }
         $empresa = $query
         ->order($orderField, $orderType)
@@ -96,6 +120,7 @@ class Empresa extends Base
                 $value['sobrenome_razao'],
                 $value['cpf_cnpj'],
                 $value['rg_ie'],
+                $value['data_nascimento_abertura'],
                 "<button class='btn btn-warning'>Editar</button>
                 <button type='button'  onclick='Delete(" . $value['id'] . ");' class='btn btn-danger'>Excluir</button>"
             ];

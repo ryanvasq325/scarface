@@ -4,6 +4,7 @@ namespace app\controller;
 
 use app\database\builder\InsertQuery;
 use app\database\builder\SelectQuery;
+use app\database\builder\DeleteQuery;
 
 class Fornecedor extends Base
 {
@@ -53,6 +54,25 @@ class Fornecedor extends Base
             die;
         } catch (\Throwable $th) {
             //throw $th;
+        }
+    }
+    public function delete($request, $response)
+    {
+        try {
+            $id = $_POST['id'];
+            $IsDelete = DeleteQuery::table('fornecedor')
+                ->where('id', '=', $id)
+                ->delete();
+
+            if (!$IsDelete) {
+                echo 'Erro ao deletar';
+                die;
+            }
+            echo "Deletado com sucesso!";
+            die;
+        } catch (\Throwable $th) {
+            echo "Erro: " . $th->getMessage();
+            die;
         }
     }
     public function listfornecedor($request, $response){
