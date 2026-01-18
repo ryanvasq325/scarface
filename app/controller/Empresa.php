@@ -121,8 +121,15 @@ class Empresa extends Base
                 $value['cpf_cnpj'],
                 $value['rg_ie'],
                 $value['data_nascimento_abertura'],
-                "<button class='btn btn-warning'>Editar</button>
-                <button type='button'  onclick='Delete(" . $value['id'] . ");' class='btn btn-danger'>Excluir</button>"
+                "<button type='button'  onclick='Editar(" . $value['id'] . ");' class='btn btn-warning'>
+                <i class=\"bi bi-pen-fill\"></i>
+                Editar
+                </button>
+
+                <button type='button'  onclick='Delete(" . $value['id'] . ");' class='btn btn-danger'>
+                 <i class=\"bi bi-trash-fill\"></i>
+                 Excluir
+                 </button>"
             ];
         }
         $data = [
