@@ -16,29 +16,29 @@ class UpdateQuery
         $self->table = $table;
         return $self;
     }
-    public function set(array $fieldsAndValues):self
+    public function set(array $fieldsAndValues): self
     {
         $this->fieldsAndValues = $fieldsAndValues;
         return $this;
     }
-    public function where(string $field, string $operator, string | int | float $value, ?string $logic = null)
+    public function where(string $field, string $operator, string | int | float $value, ?string $logic = null): self
     {
         $placeHolder = '';
         $placeHolder = $field;
         if (str_contains($placeHolder, '.')) {
             $placeHolder = substr($field, strpos($field, '.') + 1);
         }
-        $this->where[] = "{$field} {$operator} : {$placeHolder} {$logic}";
+        $this->where[] = "{$field} {$operator} :{$placeHolder} {$logic}";
         $this->binds[$placeHolder] = $value;
         return $this;
     }
     private function createQuery(): string
     {
         if (!$this->table) {
-            throw new \Exception("A consulta precisa invocar o método table.");
+            throw new \Exception("Por favor informe o nome da tabela!");
         }
         if (!$this->fieldsAndValues) {
-            throw new \Exception("A consulta precisa dos dados para realizar a atualização.");
+            throw new \Exception("Para atualizar informe os dados!");
         }
         $query = '';
         $query = "update {$this->table} set ";
@@ -48,26 +48,24 @@ class UpdateQuery
         }
         $query = rtrim($query, ',');
         $query .= (isset($this->where) and (count($this->where) > 0))
-        ?
-        ' where ' . implode(' ', $this->where) :
-        '';
+            ?
+            ' where ' . implode(' ', $this->where)
+            : '';
         return $query;
     }
-    public function executeQuery($query): bool
+    public function executeQuery(string $query): ?bool
     {
-        $connection = Connection::connection();
-        $prepare = $connection->prepare($query);
-        return $prepare->execute($this->binds ?? []);
+        try {
+            $connection = Connection::connection();
+            $prepare = $connection->prepare($query);
+            return $prepare->execute($this->binds ?? []);
+        } catch (\Exception $e) {
+            throw new \Exception("Erro ao atualizar: " . $e->getMessage());
+        }
     }
-    public function update(): bool
+    public function update(): ?bool
     {
         $query = $this->createQuery();
-        try {
-            return $this->executeQuery($query);
-        } catch (\PDOException $e) {
-            throw new \Exception("Restrição: {$e->getMessage()}, SQL: " . $query);
-        }
-        }
+        return $this->executeQuery($query);
     }
-
-
+}

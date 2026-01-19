@@ -5,6 +5,7 @@ namespace app\controller;
 use app\database\builder\InsertQuery;
 use app\database\builder\SelectQuery;
 use app\database\builder\DeleteQuery;
+use app\database\builder\UpdateQuery;
 
 class Empresa extends Base
 {
@@ -21,41 +22,56 @@ class Empresa extends Base
     }
     public function cadastro($request, $response)
     {
-        $dadosTemplate = [
-            'titulo' => 'Cadastro de Empresas'
-        ];
-        return $this->getTwig()
-            ->render($response, $this->setView('empresa'), $dadosTemplate)
-            ->withHeader('Content-Type', 'text/html')
-            ->withStatus(200);
+        try {
+            $dadosTemplate = [
+                'acao' => 'c',
+                'titulo' => 'Cadastro'
+            ];
+            return $this->getTwig()
+                ->render($response, $this->setView('empresa'), $dadosTemplate)
+                ->withHeader('Content-Type', 'text/html')
+                ->withStatus(200);
+        } catch (\Exception $e) {
+            var_dump($e);
+        }
     }
     public function insert($request, $response)
     {
         try {
-            $nome = $_POST['nome'];
-            $sobrenome = $_POST['sobrenome'];
-            $cpf = $_POST['cpf'];
-            $rg = $_POST['rg'];
-            $data_nascimento = $_POST['data_nascimento'];
-            
-            
-            $FieldsAndValues = [
-                'nome_fantasia' => $nome,
-                'sobrenome_razao' => $sobrenome,
-                'cpf_cnpj' => $cpf,
-                'rg_ie' => $rg,
-                'data_nascimento_abertura' => $data_nascimento,
+            $form = $request->getParsedBody();
+            $FieldAndValues = [
+                'nome_fantasia' => $form['nome_fantasia'],
+                'sobrenome_razao' => $form['sobrenome_razao'],
+                'cpf_cnpj' => $form['cpf_cnpj'],
+                'rg_ie' => $form['rg_ie']
             ];
-
-            $IsSave = InsertQuery::table('empresa')->save($FieldsAndValues);
+            $IsSave = InsertQuery::table('empresa')->save($FieldAndValues);
             if (!$IsSave) {
-                echo 'Erro ao salvar';
-                die;
+                return $this->SendJson($response, ['status' => false, 'msg' => 'Restrição: ' . $IsSave, 'id' => 0], 403);
             }
-            echo "Salvo com sucesso!";
-            die;
-        } catch (\Throwable $th) {
-            //throw $th;
+            $empresa = SelectQuery::select('id')->from('empresa')->order('id', 'desc')->fetch();
+            return $this->SendJson($response, ['status' => true, 'msg' => 'Salvo com sucesso', 'id' => $empresa['id']], 201);
+        } catch (\Exception $e) {
+            return $this->SendJson($response, ['status' => false, 'msg' => 'Restrição: ' . $e->getMessage(), 'id' => 0], 500);
+        }
+    }
+    public function alterar($request, $response, $args)
+    {
+        try {
+            $id = $args['id'];
+            $empresa = SelectQuery::select()->from('empresa')->where('id', '=', $id)->fetch();
+            $dadosTemplate = [
+                'acao' => 'e',
+                'id' => $id,
+                'titulo' => 'Cadastro e edição',
+                'empresa' => $empresa
+            ];
+            return $this->getTwig()
+                ->render($response, $this->setView('empresa'), $dadosTemplate)
+                ->withHeader('Content-Type', 'text/html')
+                ->withStatus(200);
+        } catch (\Exception $e) {
+            var_dump($e);
         }
     }
     public function delete($request, $response)
@@ -121,10 +137,7 @@ class Empresa extends Base
                 $value['cpf_cnpj'],
                 $value['rg_ie'],
                 $value['data_nascimento_abertura'],
-                "<button type='button'  onclick='Editar(" . $value['id'] . ");' class='btn btn-warning'>
-                <i class=\"bi bi-pen-fill\"></i>
-                Editar
-                </button>
+                "<a href=\"/empresa/alterar/" . $value['id'] . "\" class=\"btn btn-warning\">Alterar</a>
 
                 <button type='button'  onclick='Delete(" . $value['id'] . ");' class='btn btn-danger'>
                  <i class=\"bi bi-trash-fill\"></i>
@@ -145,8 +158,29 @@ class Empresa extends Base
         return $response
             ->withHeader('Content-Type', 'application/json')
             ->withStatus(200);
-        /*
-        */
+    }
+    public function update($request, $response)
+    {
+        try {
+            $form = $request->getParsedBody();
+            $id = $form['id'];
+            if (is_null($id) || empty($id)) {
+                return $this->SendJson($response, ['status' => false, 'msg' => 'Por favor informe o ID', 'id' => 0], 500);
+            }
+            $FieldAndValues = [
+                'nome_fantasia' => $form['nome_fantasia'],
+                'sobrenome_razao' => $form['sobrenome_razao'],
+                'cpf_cnpj' => $form['cpf_cnpj'],
+                'rg_ie' => $form['rg_ie']
+            ];
+            $IsUpdate = UpdateQuery::table('empresa')->set($FieldAndValues)->where('id', '=', $id)->update();
+            if (!$IsUpdate) {
+                return $this->SendJson($response, ['status' => false, 'msg' => 'Restrição: ' . $IsUpdate, 'id' => 0], 403);
+            }
+            return $this->SendJson($response, ['status' => true, 'msg' => 'Atualizado com sucesso!', 'id' => $id]);
+        } catch (\Exception $e) {
+            return $this->SendJson($response, ['status' => false, 'msg' => 'Restrição: ' . $e->getMessage(), 'id' => 0], 500);
+        }
     }
 }
  

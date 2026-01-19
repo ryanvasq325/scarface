@@ -5,6 +5,7 @@ namespace app\controller;
 use app\database\builder\InsertQuery;
 use app\database\builder\SelectQuery;
 use app\database\builder\DeleteQuery;
+use app\database\builder\UpdateQuery;
 
 class Fornecedor extends Base
 {
@@ -21,39 +22,56 @@ class Fornecedor extends Base
     }
     public function cadastro($request, $response)
     {
-        $dadosTemplate = [
-            'titulo' => 'Cadastro de Fornecedor'
-        ];
-        return $this->getTwig()
-            ->render($response, $this->setView('fornecedor'), $dadosTemplate)
-            ->withHeader('Content-Type', 'text/html')
-            ->withStatus(200);
+        try {
+            $dadosTemplate = [
+                'acao' => 'c',
+                'titulo' => 'Cadastro'
+            ];
+            return $this->getTwig()
+                ->render($response, $this->setView('fornecedor'), $dadosTemplate)
+                ->withHeader('Content-Type', 'text/html')
+                ->withStatus(200);
+        } catch (\Exception $e) {
+            var_dump($e);
+        }
     }
     public function insert($request, $response)
     {
         try {
-            $nome = $_POST['nome'];
-            $sobrenome = $_POST['sobrenome'];
-            $cpf = $_POST['cpf'];
-            $rg = $_POST['rg'];
-            
-            
-            $FieldsAndValues = [
-                'nome_fantasia' => $nome,
-                'sobrenome_razao' => $sobrenome,
-                'cpf_cnpj' => $cpf,
-                'rg_ie' => $rg
+            $form = $request->getParsedBody();
+            $FieldAndValues = [
+                'nome_fantasia' => $form['nome_fantasia'],
+                'sobrenome_razao' => $form['sobrenome_razao'],
+                'cpf_cnpj' => $form['cpf_cnpj'],
+                'rg_ie' => $form['rg_ie']
             ];
-
-            $IsSave = InsertQuery::table('fornecedor')->save($FieldsAndValues);
+            $IsSave = InsertQuery::table('fornecedor')->save($FieldAndValues);
             if (!$IsSave) {
-                echo 'Erro ao salvar';
-                die;
+                return $this->SendJson($response, ['status' => false, 'msg' => 'Restrição: ' . $IsSave, 'id' => 0], 403);
             }
-            echo "Salvo com sucesso!";
-            die;
-        } catch (\Throwable $th) {
-            //throw $th;
+            $fornecedor = SelectQuery::select('id')->from('fornecedor')->order('id', 'desc')->fetch();
+            return $this->SendJson($response, ['status' => true, 'msg' => 'Salvo com sucesso', 'id' => $fornecedor['id']], 201);
+        } catch (\Exception $e) {
+            return $this->SendJson($response, ['status' => false, 'msg' => 'Restrição: ' . $e->getMessage(), 'id' => 0], 500);
+        }
+    }
+    public function alterar($request, $response, $args)
+    {
+        try {
+            $id = $args['id'];
+            $fornecedor = SelectQuery::select()->from('fornecedor')->where('id', '=', $id)->fetch();
+            $dadosTemplate = [
+                'acao' => 'e',
+                'id' => $id,
+                'titulo' => 'Cadastro e edição',
+                'fornecedor' => $fornecedor
+            ];
+            return $this->getTwig()
+                ->render($response, $this->setView('fornecedor'), $dadosTemplate)
+                ->withHeader('Content-Type', 'text/html')
+                ->withStatus(200);
+        } catch (\Exception $e) {
+            var_dump($e);
         }
     }
     public function delete($request, $response)
@@ -75,7 +93,8 @@ class Fornecedor extends Base
             die;
         }
     }
-    public function listfornecedor($request, $response){
+    public function listfornecedor($request, $response)
+    {
         #Captura todas a variaveis de forma mais segura VARIAVEIS POST.
         $form = $request->getParsedBody();
         #Qual a coluna da tabela deve ser ordenada.
@@ -86,40 +105,37 @@ class Fornecedor extends Base
         $start = $form['start'];
         #Limite de registro a serem retornados do banco de dados LIMIT
         $length = $form['length'];
-        $fields= [
-          0 => 'id',  
-          1 => 'nome_fantasia',  
-          2 => 'sobrenome_razao',  
-          3 => 'cpf_cnpj',  
-          4 => 'rg_ie',
+        $fields = [
+            0 => 'id',
+            1 => 'nome_fantasia',
+            2 => 'sobrenome_razao',
+            3 => 'cpf_cnpj',
+            4 => 'rg_ie',
         ];
         #Capturamos o nome do campo a ser odernado.
         $orderField = $fields[$order];
         #O termo pesquisado
-        $term = $form ['search']['value'];
+        $term = $form['search']['value'];
         $query = SelectQuery::select('id,nome_fantasia,sobrenome_razao,cpf_cnpj,rg_ie')->from('fornecedor');
         if (!is_null($term) && ($term !== '')) {
             $query->where('nome_fantasia', 'ilike', "%{$term}%", 'or')
-            ->where('sobrenome_razao', 'ilike', "%{$term}%", 'or')
-            ->where('cpf_cnpj', 'ilike', "%{$term}%", 'or')
-            ->where('rg_ie', 'ilike', "%{$term}%");
+                ->where('sobrenome_razao', 'ilike', "%{$term}%", 'or')
+                ->where('cpf_cnpj', 'ilike', "%{$term}%", 'or')
+                ->where('rg_ie', 'ilike', "%{$term}%");
         }
-        $fornecedor = $query
-        ->order($orderField, $orderType)
-        ->limit($length, $start)
-        ->fetchAll();
-        $fornecedorData = [];
-        foreach($fornecedor as $key => $value) {
-            $fornecedorData[$key] = [
+        $fornecedors = $query
+            ->order($orderField, $orderType)
+            ->limit($length, $start)
+            ->fetchAll();
+        $fornecedorsData = [];
+        foreach ($fornecedors as $key => $value) {
+            $fornecedorsData[$key] = [
                 $value['id'],
                 $value['nome_fantasia'],
                 $value['sobrenome_razao'],
                 $value['cpf_cnpj'],
                 $value['rg_ie'],
-                "<button type='button'  onclick='Editar(" . $value['id'] . ");' class='btn btn-warning'>
-                <i class=\"bi bi-pen-fill\"></i>
-                Editar
-                </button>
+                "<a href=\"/fornecedor/alterar/" . $value['id'] . "\" class=\"btn btn-warning\">Alterar</a>
 
                 <button type='button'  onclick='Delete(" . $value['id'] . ");' class='btn btn-danger'>
                  <i class=\"bi bi-trash-fill\"></i>
@@ -129,9 +145,9 @@ class Fornecedor extends Base
         }
         $data = [
             'status' => true,
-            'recordsTotal' => count($fornecedor),
-            'recordsFiltered' => count($fornecedor),
-            'data' => $fornecedorData
+            'recordsTotal' => count($fornecedors),
+            'recordsFiltered' => count($fornecedors),
+            'data' => $fornecedorsData
         ];
         $payload = json_encode($data);
 
@@ -140,7 +156,29 @@ class Fornecedor extends Base
         return $response
             ->withHeader('Content-Type', 'application/json')
             ->withStatus(200);
-        /*
-        */
+    }
+
+    public function update($request, $response)
+    {
+        try {
+            $form = $request->getParsedBody();
+            $id = $form['id'];
+            if (is_null($id) || empty($id)) {
+                return $this->SendJson($response, ['status' => false, 'msg' => 'Por favor informe o ID', 'id' => 0], 500);
+            }
+            $FieldAndValues = [
+                'nome_fantasia' => $form['nome_fantasia'],
+                'sobrenome_razao' => $form['sobrenome_razao'],
+                'cpf_cnpj' => $form['cpf_cnpj'],
+                'rg_ie' => $form['rg_ie']
+            ];
+            $IsUpdate = UpdateQuery::table('fornecedor')->set($FieldAndValues)->where('id', '=', $id)->update();
+            if (!$IsUpdate) {
+                return $this->SendJson($response, ['status' => false, 'msg' => 'Restrição: ' . $IsUpdate, 'id' => 0], 403);
+            }
+            return $this->SendJson($response, ['status' => true, 'msg' => 'Atualizado com sucesso!', 'id' => $id]);
+        } catch (\Exception $e) {
+            return $this->SendJson($response, ['status' => false, 'msg' => 'Restrição: ' . $e->getMessage(), 'id' => 0], 500);
+        }
     }
 }
