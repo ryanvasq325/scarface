@@ -103,25 +103,25 @@ class User extends Base
                 <i class=\"bi bi-trash-fill\"></i>
                 Excluir
                 </button>"
-                ];
-                }
-                $data = [
-                    'status' => true,
-                    'recordsTotal' => count($users),
-                    'recordsFiltered' => count($users),
-            'data' => $userData
             ];
-            $payload = json_encode($data);
-            
-        $response->getBody()->write($payload);
-        
-        return $response
-        ->withHeader('Content-Type', 'application/json')
-        ->withStatus(200);
         }
-        public function alterar($request, $response, $args)
-        {
-            try {
+        $data = [
+            'status' => true,
+            'recordsTotal' => count($users),
+            'recordsFiltered' => count($users),
+            'data' => $userData
+        ];
+        $payload = json_encode($data);
+
+        $response->getBody()->write($payload);
+
+        return $response
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus(200);
+    }
+    public function alterar($request, $response, $args)
+    {
+        try {
             $id = $args['id'];
             $user = SelectQuery::select()->from('usuario')->where('id', '=', $id)->fetch();
             $dadosTemplate = [
@@ -129,23 +129,23 @@ class User extends Base
                 'id' => $id,
                 'titulo' => 'Cadastro e edição',
                 'user' => $user
-                ];
-                return $this->getTwig()
+            ];
+            return $this->getTwig()
                 ->render($response, $this->setView('user'), $dadosTemplate)
                 ->withHeader('Content-Type', 'text/html')
                 ->withStatus(200);
-                } catch (\Exception $e) {
-                    var_dump($e);
-                    }
-                    }
-                    public function delete($request, $response)
-                    {
-                        try {
+        } catch (\Exception $e) {
+            var_dump($e);
+        }
+    }
+    public function delete($request, $response)
+    {
+        try {
             $id = $_POST['id'];
             $IsDelete = DeleteQuery::table('usuario')
-            ->where('id', '=', $id)
+                ->where('id', '=', $id)
                 ->delete();
-    
+
             if (!$IsDelete) {
                 echo json_encode(['status' => false, 'msg' => $IsDelete, 'id' => $id]);
                 die;
@@ -155,9 +155,9 @@ class User extends Base
         } catch (\Throwable $th) {
             echo "Erro: " . $th->getMessage();
             die;
-            }
-            }
-            public function update($request, $response)
+        }
+    }
+    public function update($request, $response)
     {
         try {
             $form = $request->getParsedBody();
@@ -179,8 +179,8 @@ class User extends Base
         } catch (\Exception $e) {
             return $this->SendJson($response, ['status' => false, 'msg' => 'Restrição: ' . $e->getMessage(), 'id' => 0], 500);
         }
-        }
-        }
+    }
+}
 
          /*"<button type='button'  onclick='Editar(" . $value['id'] . ");' class='btn btn-warning'>
          <i class=\"bi bi-pen-fill\"></i>
