@@ -16,11 +16,12 @@ Salvar.addEventListener('click', async () => {
             title: "Erro ao cadastrar usuário!",
             text: response.msg,
         });
-        return
+        return;
     }
     Swal.fire({
         title: "Cadastro realizado com sucesso!",
         icon: "success",
         draggable: true
     });
+    
 });

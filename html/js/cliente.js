@@ -13,7 +13,7 @@ Salvar.addEventListener('click', async () => {
     if (!response.status) {
         Swal.fire({
             icon: "error",
-            title: "Eita patrão!",
+            title: "Oloko!",
             text: response.msg,
         });
         return
