@@ -29,7 +29,7 @@ $app->group('/usuario', function (RouteCollectorProxy $group) {
     $group->get('/cadastro', User::class . ':cadastro')->add(Middleware::authentication());
     $group->get('/alterar/{id}', User::class . ':alterar')->add(Middleware::authentication());
     $group->post('/listuser', User::class . ':listuser');
-    $group->post('/update', User::class . ':listuser');
+    $group->post('/update', User::class . ':update');
     $group->post('/insert', User::class . ':insert');
     $group->post('/delete', User::class . ':delete');
 });

@@ -22,41 +22,37 @@ class User extends Base
     }
     public function cadastro($request, $response)
     {
-        $dadosTemplate = [
-            'titulo' => 'Cadastro de usuário'
-        ];
-        return $this->getTwig()
-            ->render($response, $this->setView('user'), $dadosTemplate)
-            ->withHeader('Content-Type', 'text/html')
-            ->withStatus(200);
+        try {
+            $dadosTemplate = [
+                'acao' => 'c',
+                'titulo' => 'Cadastro e edição'
+            ];
+            return $this->getTwig()
+                ->render($response, $this->setView('user'), $dadosTemplate)
+                ->withHeader('Content-Type', 'text/html')
+                ->withStatus(200);
+        } catch (\Exception $e) {
+            var_dump($e);
+        }
     }
     public function insert($request, $response)
     {
         try {
-            $nome = $_POST['nome'];
-            $sobrenome = $_POST['sobrenome'];
-            $cpf = $_POST['cpf'];
-            $rg = $_POST['rg'];
-            $senha = $_POST['senha'];
-
-
-            $FieldsAndValues = [
-                'nome' => $nome,
-                'sobrenome' => $sobrenome,
-                'cpf' => $cpf,
-                'rg' => $rg,
-                'senha' => password_hash($senha, PASSWORD_DEFAULT)
+            $form = $request->getParsedBody();
+            $FieldAndValues = [
+                'nome' => $form['nome'],
+                'sobrenome' => $form['sobrenome'],
+                'cpf' => $form['cpf'],
+                'rg' => $form['rg']
             ];
-
-            $IsSave = InsertQuery::table('usuario')->save($FieldsAndValues);
+            $IsSave = InsertQuery::table('usuario')->save($FieldAndValues);
             if (!$IsSave) {
-                echo 'Erro ao salvar';
-                die;
+                return $this->SendJson($response, ['status' => false, 'msg' => 'Restrição: ' . $IsSave, 'id' => 0], 403);
             }
-            echo "Salvo com sucesso!";
-            die;
-        } catch (\Throwable $th) {
-            //throw $th;
+            $user = SelectQuery::select('id')->from('usuario')->order('id', 'desc')->fetch();
+            return $this->SendJson($response, ['status' => true, 'msg' => 'Salvo com sucesso', 'id' => $user['id']], 201);
+        } catch (\Exception $e) {
+            return $this->SendJson($response, ['status' => false, 'msg' => 'Restrição: ' . $e->getMessage(), 'id' => 0], 500);
         }
     }
     public function listuser($request, $response)
@@ -101,34 +97,31 @@ class User extends Base
                 $value['sobrenome'],
                 $value['cpf'],
                 $value['rg'],
-                "<button type='button'  onclick='Editar(" . $value['id'] . ");' class='btn btn-warning'>
-                <i class=\"bi bi-pen-fill\"></i>
-                Editar
-                </button>
+                "<a href=\"/usuario/alterar/" . $value['id'] . "\" class=\"btn btn-warning\">Alterar</a>
 
-                 <button type='button'  onclick='Delete(" . $value['id'] . ");' class='btn btn-danger'>
-                 <i class=\"bi bi-trash-fill\"></i>
-                 Excluir
-                 </button>"
-            ];
-        }
-        $data = [
-            'status' => true,
-            'recordsTotal' => count($users),
-            'recordsFiltered' => count($users),
+                <button type='button'  onclick='Delete(" . $value['id'] . ");' class='btn btn-danger'>
+                <i class=\"bi bi-trash-fill\"></i>
+                Excluir
+                </button>"
+                ];
+                }
+                $data = [
+                    'status' => true,
+                    'recordsTotal' => count($users),
+                    'recordsFiltered' => count($users),
             'data' => $userData
-        ];
-        $payload = json_encode($data);
-
+            ];
+            $payload = json_encode($data);
+            
         $response->getBody()->write($payload);
-
+        
         return $response
-            ->withHeader('Content-Type', 'application/json')
-            ->withStatus(200);
-    }
-    public function alterar($request, $response, $args)
-    {
-        try {
+        ->withHeader('Content-Type', 'application/json')
+        ->withStatus(200);
+        }
+        public function alterar($request, $response, $args)
+        {
+            try {
             $id = $args['id'];
             $user = SelectQuery::select()->from('usuario')->where('id', '=', $id)->fetch();
             $dadosTemplate = [
@@ -136,21 +129,21 @@ class User extends Base
                 'id' => $id,
                 'titulo' => 'Cadastro e edição',
                 'user' => $user
-            ];
-            return $this->getTwig()
-            ->render($response, $this->setView('user'), $dadosTemplate)
-            ->withHeader('Content-Type', 'text/html')
-            ->withStatus(200);
-        } catch (\Exception $e) {
-            var_dump($e);
-        }
-    }
-    public function delete($request, $response)
-    {
-        try {
+                ];
+                return $this->getTwig()
+                ->render($response, $this->setView('user'), $dadosTemplate)
+                ->withHeader('Content-Type', 'text/html')
+                ->withStatus(200);
+                } catch (\Exception $e) {
+                    var_dump($e);
+                    }
+                    }
+                    public function delete($request, $response)
+                    {
+                        try {
             $id = $_POST['id'];
             $IsDelete = DeleteQuery::table('usuario')
-                ->where('id', '=', $id)
+            ->where('id', '=', $id)
                 ->delete();
     
             if (!$IsDelete) {
@@ -162,9 +155,9 @@ class User extends Base
         } catch (\Throwable $th) {
             echo "Erro: " . $th->getMessage();
             die;
-        }
-    }
-    public function update($request, $response)
+            }
+            }
+            public function update($request, $response)
     {
         try {
             $form = $request->getParsedBody();
@@ -186,5 +179,10 @@ class User extends Base
         } catch (\Exception $e) {
             return $this->SendJson($response, ['status' => false, 'msg' => 'Restrição: ' . $e->getMessage(), 'id' => 0], 500);
         }
-    }
-}
+        }
+        }
+
+         /*"<button type='button'  onclick='Editar(" . $value['id'] . ");' class='btn btn-warning'>
+         <i class=\"bi bi-pen-fill\"></i>
+         Editar
+         </button> */
