@@ -25,7 +25,7 @@ class User extends Base
         try {
             $dadosTemplate = [
                 'acao' => 'c',
-                'titulo' => 'Cadastro e edição'
+                'titulo' => 'Cadastro'
             ];
             return $this->getTwig()
                 ->render($response, $this->setView('user'), $dadosTemplate)
