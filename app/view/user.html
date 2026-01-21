@@ -19,8 +19,8 @@
         <div class="row">
             <div class="col-12">
                 <form id="form">
-                    <input type="" id="acao" name="acao" value="{{acao}}">
-                    <input type="" id="id" name="id" value="{{id}}">
+                    <input type="hidden" id="acao" name="acao" value="{{acao}}">
+                    <input type="hidden" id="id" name="id" value="{{id}}">
                     <div class="card">
                         <div class="card-header">
                             <a href="/usuario/lista" class="btn btn-warning">Voltar</a>
@@ -30,12 +30,12 @@
                                 <div class="col-6 mb-3">
                                     <label for="nome" class="form-label">Nome</label>
                                     <input type="text" class="form-control" id="nome" name="nome"
-                                        placeholder="Informe seu nome" value="{{user.nome}}" autofocus>
+                                        placeholder="Informe seu nome" value="{{user.nome}}">
                                 </div>
                                 <div class="col-6 mb-3">
                                     <label for="sobrenome" class="form-label">Sobrenome</label>
                                     <input type="text" class="form-control" id="sobrenome" name="sobrenome"
-                                        placeholder="Informe seu sobre nome" value="{{user.sobrenome}}">
+                                        placeholder=" Informe seu sobre nome" value="{{user.sobrenome}}">
                                 </div>
                                 <div class="col-6 mb-3">
                                     <label for="rg" class="form-label">RG</label>
